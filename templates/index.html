@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <title>Flask Nutrition App</title>
+</head>
+<body>
+    <h1>Nutrition App</h1>
+
+    <label for="age_gender">Select Age/Gender:</label>
+    <select id="age_gender" name="age_gender">
+        {% for age_gender in age_genders %}
+            <option value="{{ age_gender }}" {% if age_gender == selected_age_gender %}selected{% endif %}>{{ age_gender }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="food">Select Food:</label>
+    <input type="text" id="food" list="foods" name="food" autocomplete="off">
+    <datalist id="foods">
+        {% for food in foods %}
+            <option value="{{ food }}">{{ food }}</option>
+        {% endfor %}
+    </datalist>
+
+    <label for="servings">Servings:</label>
+    <input type="number" id="servings" name="servings" value="{{ servings }}">
+
+    <button onclick="updateFood()">Add Food</button>
+
+    <div id="progress">
+        <!-- Progress visualizations will be displayed here -->
+    </div>
+
+    <script>
+
+        function updateFood() {
+            var selected_food = $('#food').val();
+
+            $.post('/update_food', { selected_food: selected_food }, function (data) {
+                console.log(data.status);
+            });
+
+            // Update the completion visualizations
+            updateVisualizations();
+        }
+
+        function updateServings() {
+            var servings = $('#servings').val();
+
+            $.post('/update_servings', { servings: servings }, function (data) {
+                console.log(data.status);
+
+                // Update the completion visualizations
+                updateVisualizations();
+            });
+        }
+
+        var intakes_data = {{ intakes_data|safe }};
+        var nutrition_data = {{ nutrition_data|default('null')|safe }};
+
+        // Event listener for age/gender dropdown
+        $('#age_gender').change(function () {
+            updateSelection();
+        });
+
+        // Event listener for food dropdown
+        $('#food').change(function () {
+            updateFood();
+        });
+
+        function updateSelection() {
+            var selected_age_gender = $('#age_gender').val();
+
+            $.post('/update_selection', { selected_age_gender: selected_age_gender }, function (data) {
+                console.log(data.status);
+
+                // Update the completion visualizations
+                updateVisualizations();
+            });
+        }
+
+        function updateVisualizations() {
+        // Clear previous visualizations
+        d3.select("#progress").html("");
+
+        // Get the selected gender and food
+        var selectedGender = $('#age_gender').val();
+        var selectedFood = $('#food').val();
+
+        try {
+            // Find the corresponding column in intakes_data
+            var intakeColumn = intakes_data[selectedGender];
+
+            // Check if the selected food exists in nutrition_data
+            if (selectedFood in nutrition_data) {
+                var nutrientColumn = nutrition_data[selectedFood];
+
+                // Convert intakeColumn to an array of key-value pairs
+                var dlist = Object.entries(intakeColumn);
+                console.log("Intake Columns:", dlist);
+
+                // Convert intakeColumn to an array of key-value pairs
+                var dlist2 = Object.entries(nutrientColumn);
+                console.log("Nutrient Columns:", dlist2);
+            } else {
+                console.error("Selected food column not found in nutrition_data");
+            }
+        } catch (error) {
+            console.error("Error updating visualizations:", error);
+        }
+    }
+    </script>
+</body>
+</html>
