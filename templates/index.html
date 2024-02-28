@@ -12,7 +12,7 @@
     <h1>Nutrition App</h1>
 
     <label for="age_gender">Select Age/Gender:</label>
-    <select id="age_gender" name="age_gender">
+    <select id="age_gender" name="age_gender" onchange="updateRecs()">
         {% for age_gender in age_genders %}
             <option value="{{ age_gender }}" {% if age_gender == selected_age_gender %}selected{% endif %}>{{ age_gender }}</option>
         {% endfor %}
@@ -29,23 +29,47 @@
     <label for="servings">Servings:</label>
     <input type="number" id="servings" name="servings" value="{{ servings }}">
 
-    <button onclick="updateFood()">Add Food</button>
+    <button onclick="updateFood(), clearForm()">Add Food</button>
 
     <div id="progress">
         <!-- Progress visualizations will be displayed here -->
     </div>
 
     <script>
+        // Set up global variables
+        var intakes_data = {{ intakes_data|safe }};
+        var nutrition_data = {{ nutrition_data|default('null')|safe }};
+        var intake_recs = []
+        var nutr_totals = []
+        var remaining = []
+        var foods = 0
+
+        function updateRecs() {
+            var selectedGender = $('#age_gender').val();
+            var intakeColumn = intakes_data[selectedGender];
+            intake_recs = Object.entries(intakeColumn);
+            remaining = Object.entries(intakeColumn);
+        }
+
+        function clearForm() {
+            $('#food').val('');
+        }
 
         function updateFood() {
+            foods++;
             var selected_food = $('#food').val();
-
+            var nutrientColumn = nutrition_data[selected_food];
+            if (nutr_totals = []) {
+                nutr_totals = Object.entries(nutrientColumn);
+            } else {
+                for (let i = 0; i < nutr_totals.length; i++) {
+                    nutr_totals[i] += nutrientColumn[i];
+                }
+            }
             $.post('/update_food', { selected_food: selected_food }, function (data) {
                 console.log(data.status);
             });
-
-            // Update the completion visualizations
-            updateVisualizations();
+            updateRemaining();
         }
 
         function updateServings() {
@@ -53,66 +77,21 @@
 
             $.post('/update_servings', { servings: servings }, function (data) {
                 console.log(data.status);
-
-                // Update the completion visualizations
-                updateVisualizations();
             });
         }
 
-        var intakes_data = {{ intakes_data|safe }};
-        var nutrition_data = {{ nutrition_data|default('null')|safe }};
-
-        // Event listener for age/gender dropdown
-        $('#age_gender').change(function () {
-            updateSelection();
-        });
-
-        // Event listener for food dropdown
-        $('#food').change(function () {
-            updateFood();
-        });
-
-        function updateSelection() {
-            var selected_age_gender = $('#age_gender').val();
-
-            $.post('/update_selection', { selected_age_gender: selected_age_gender }, function (data) {
-                console.log(data.status);
-
-                // Update the completion visualizations
-                updateVisualizations();
-            });
+        function updateRemaining() {
+            for (let i = 0; i < intake_recs.length; i++) {
+                    remaining[i] = intake_recs[i] - nutr_totals[i];
+                }
+            console.log("Nutr: ", nutr_totals);
+            console.log("Remaining: ", remaining);
+            console.log("Recs: ", intake_recs);
+            updateVisualizations();
         }
 
         function updateVisualizations() {
-        // Clear previous visualizations
-        d3.select("#progress").html("");
-
-        // Get the selected gender and food
-        var selectedGender = $('#age_gender').val();
-        var selectedFood = $('#food').val();
-
-        try {
-            // Find the corresponding column in intakes_data
-            var intakeColumn = intakes_data[selectedGender];
-
-            // Check if the selected food exists in nutrition_data
-            if (selectedFood in nutrition_data) {
-                var nutrientColumn = nutrition_data[selectedFood];
-
-                // Convert intakeColumn to an array of key-value pairs
-                var dlist = Object.entries(intakeColumn);
-                console.log("Intake Columns:", dlist);
-
-                // Convert intakeColumn to an array of key-value pairs
-                var dlist2 = Object.entries(nutrientColumn);
-                console.log("Nutrient Columns:", dlist2);
-            } else {
-                console.error("Selected food column not found in nutrition_data");
-            }
-        } catch (error) {
-            console.error("Error updating visualizations:", error);
         }
-    }
     </script>
 </body>
 </html>
