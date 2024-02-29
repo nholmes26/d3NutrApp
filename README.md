@@ -6,5 +6,5 @@ For our final project in COMP790 - Information Visualization, we are utlilizing 
 - We have almost 8.8k different foods and their corresponding macronutrient levels per serving, obtained from https://www.kaggle.com/datasets/trolukovich/nutritional-values-for-common-foods-and-products?resource=download <br />
 <br />
 To run locally: <br />
-Clone this repo using `git clone git@github.com:nholmes26/d3NutrApp.git` <br />
-Navigate to the directory in a terminal and run `python app.py` <br />
+<br /> Clone this repo using `git clone git@github.com:nholmes26/d3NutrApp.git`
+<br /> Navigate to the directory in a terminal and run `python app.py` 
