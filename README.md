@@ -7,6 +7,6 @@ For our final project in COMP790 - Information Visualization, we are utlilizing 
 
 To run locally:
 <br />
-Clone this repo using `git clone git@github.com:nholmes26/d3NutrApp.git`
+- Clone this repo using `git clone git@github.com:nholmes26/d3NutrApp.git`
 <br />
-Navigate to the directory in a terminal and run `python app.py` 
+- Navigate to the directory in a terminal and run `python app.py` 
