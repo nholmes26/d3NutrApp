@@ -59,12 +59,17 @@
             foods++;
             var selected_food = $('#food').val();
             var nutrientColumn = nutrition_data[selected_food];
-            if (nutr_totals = []) {
+            if (nutr_totals.length === 0) {
+                console.log("1");
                 nutr_totals = Object.entries(nutrientColumn);
             } else {
+                var temp_nutr = Object.entries(nutrientColumn);
                 for (let i = 0; i < nutr_totals.length; i++) {
-                    nutr_totals[i] += nutrientColumn[i];
+                    nutr_totals[i][1] += temp_nutr[i][1];
                 }
+            }
+            for (let i = 0; i < nutr_totals.length; i++) {
+                    nutr_totals[i][1] = nutr_totals[i][1] * $('#servings').val();
             }
             $.post('/update_food', { selected_food: selected_food }, function (data) {
                 console.log(data.status);
@@ -82,11 +87,11 @@
 
         function updateRemaining() {
             for (let i = 0; i < intake_recs.length; i++) {
-                    remaining[i] = intake_recs[i] - nutr_totals[i];
+                    remaining[i][1] = intake_recs[i][1] - nutr_totals[i][1];
                 }
-            console.log("Nutr: ", nutr_totals);
-            console.log("Remaining: ", remaining);
-            console.log("Recs: ", intake_recs);
+            // console.log(nutr_totals);
+            // console.log(remaining);
+            // console.log(intake_recs);
             updateVisualizations();
         }
 
