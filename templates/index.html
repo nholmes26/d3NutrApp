@@ -12,32 +12,63 @@
             display: flex;
             justify-content: space-between;
         }
+        #inputDiv {
+            display: flex;
+            justify-content: space-between;
+        }
+        #modeDiv {
+            position: fixed;
+            top: 10px; /* Adjust the top position as needed */
+            right: 10px; /* Adjust the right position as needed */
+        }
     </style>
 </head>
 <body>
     <h1>Nutrition App</h1>
 
-    <label for="age_gender">Select Age/Gender:</label>
-    <select id="age_gender" name="age_gender" onchange="updateRecs()">
-        <option value="Select Demographic" selected>Select Demographic</option>
-        {% for age_gender in age_genders %}
-            <option value="{{ age_gender }}" {% if age_gender == selected_age_gender %}selected{% endif %}>{{ age_gender }}</option>
-        {% endfor %}
-    </select>
+    <div id="inputDiv">
 
-    <label for="food">Select Food:</label>
-    <input type="text" id="food" list="foods" name="food" autocomplete="off">
-    <datalist id="foods">
-        {% for food in foods %}
-            <option value="{{ food }}">{{ food }}</option>
-        {% endfor %}
-    </datalist>
+        <div class="input">
+            <label for="age_gender">Select Age/Gender:</label>
+            <select id="age_gender" name="age_gender" onchange="updateRecs()">
+                <option value="Select Demographic" selected>Select Demographic</option>
+                {% for age_gender in age_genders %}
+                    <option value="{{ age_gender }}" {% if age_gender == selected_age_gender %}selected{% endif %}>{{ age_gender }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <label for="servings">Grams Consumed:</label>
-    <input type="number" id="servings" name="servings" value="{{ servings }}">
+        <div class="input">
+            <label for="food">Select Food:</label>
+            <input type="text" id="food" list="foods" name="food" autocomplete="off">
+            <datalist id="foods">
+                {% for food in foods %}
+                    <option value="{{ food }}">{{ food }}</option>
+                {% endfor %}
+            </datalist>
+        </div>
 
-    <button onclick="updateFood(), clearForm()">Add Food</button>
-    <button onclick="refreshPage()">Restart</button>
+        <div class="input">
+            <label for="servings">Grams Consumed:</label>
+            <input type="number" id="servings" name="servings" value="{{ servings }}">
+        </div>
+
+        <div class="input">
+            <button onclick="updateFood(), clearFood()">Add Food</button>
+        </div>
+
+        <div class="input">
+            <button onclick="clearPage()">Restart</button>
+        </div>
+    </div>
+
+    <div id="modeDiv">
+        <label for="mode">Mode:</label>
+        <select id="mode" name="mode" onchange="clearPage()">
+            <option value="number" selected>Number Mode</option>
+            <option value="percent" selected>Percentage Mode</option>
+        </select>
+    </div>
 
     <div class="visualization-container">
         <div id="cal_vis">Calories:</div>
@@ -53,7 +84,16 @@
         var intake_recs = []
         var nutr_totals = []
         var remaining = []
-        var foods = 0
+
+        function clearPage() {
+            intake_recs = []
+            nutr_totals = []
+            remaining = []
+            d3.selectAll('svg').remove();
+            $('#age_gender').val('Select Demographic');
+            $('#food').val('');
+            $('#servings').val('1');
+        }
 
         function updateRecs() {
             nutr_totals = []
@@ -63,13 +103,13 @@
             remaining = Object.entries(intakeColumn);
         }
 
-        function clearForm() {
+        function clearFood() {
             $('#food').val('');
+            $('#servings').val('1');
         }
 
         function updateFood() {
             d3.selectAll('svg').remove();
-            foods++;
             var selected_food = $('#food').val();
             var nutrientColumn = nutrition_data[selected_food];
             if (nutr_totals.length === 0) {
@@ -101,8 +141,21 @@
         }
 
         function updateRemaining() {
-            for (let i = 0; i < intake_recs.length; i++) {
-                remaining[i][1] = intake_recs[i][1] - nutr_totals[i][1];
+            if ($('#mode').val() === "percent") {
+                for (let i = 0; i < intake_recs.length; i++) {
+                    if ((intake_recs[i][1] - nutr_totals[i][1]) < 0) {
+                        nutr_totals[i][1] = (nutr_totals[i][1] / intake_recs[i][1]) * 100;
+                        remaining[i][1] = 0;
+                    } else {
+                        console.log(nutr_totals[i][1])
+                        remaining[i][1] = ((intake_recs[i][1] - nutr_totals[i][1]) / intake_recs[i][1]) * 100;
+                        nutr_totals[i][1] = (nutr_totals[i][1] / intake_recs[i][1]) * 100
+                    }
+                } 
+            } else {
+                for (let i = 0; i < intake_recs.length; i++) {
+                    remaining[i][1] = intake_recs[i][1] - nutr_totals[i][1]; 
+                }
             }
             var calArr = [nutr_totals[0][1], remaining[0][1]];
             var carbArr = [nutr_totals[1][1], remaining[1][1]];
@@ -113,6 +166,13 @@
             createVis("#carb_vis", "Carbohydrates", carbArr);
             createVis("#prot_vis", "Protein", protArr);
             createVis("#fat_vis", "Total Fat", fatArr);
+
+            if ($('#mode').val() === "percent") {
+                for (let i = 0; i < intake_recs.length; i++) {
+                    nutr_totals[i][1] = ((nutr_totals[i][1] / 100) * intake_recs[i][1]);
+                    remaining[i][1] = ((remaining[i][1] / 100) * intake_recs[i][1]);
+                }
+            }
         }
 
         function createVis(vis, title, data) {
@@ -182,25 +242,39 @@
                 })
 
             // Add the polylines between chart and labels:
-            svg
-            .selectAll('allLabels')
-            .data(data_ready)
-            .join('text')
-                .text(d => Math.round(d.data[1]))
-                .attr('transform', function(d) {
-                    const pos = outerArc.centroid(d);
-                    const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
-                    pos[0] = radius * 0.99 * (midangle < Math.PI ? 1 : -1);
-                    return `translate(${pos})`;
-                })
-                .style('text-anchor', function(d) {
-                    const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
-                    return (midangle < Math.PI ? 'start' : 'end')
-                })
-        }
-
-        function refreshPage() {
-            location.reload(true); // Reload the page
+            if ($('#mode').val() === "percent") {
+                svg
+                .selectAll('allLabels')
+                .data(data_ready)
+                .join('text')
+                    .text(d => `${Math.round(d.data[1])} %`)
+                    .attr('transform', function(d) {
+                        const pos = outerArc.centroid(d);
+                        const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+                        pos[0] = radius * 0.99 * (midangle < Math.PI ? 1 : -1);
+                        return `translate(${pos})`;
+                    })
+                    .style('text-anchor', function(d) {
+                        const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+                        return (midangle < Math.PI ? 'start' : 'end')
+                    })
+            } else {
+                svg
+                .selectAll('allLabels')
+                .data(data_ready)
+                .join('text')
+                    .text(d => `${Math.round(d.data[1])}`)
+                    .attr('transform', function(d) {
+                        const pos = outerArc.centroid(d);
+                        const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+                        pos[0] = radius * 0.99 * (midangle < Math.PI ? 1 : -1);
+                        return `translate(${pos})`;
+                    })
+                    .style('text-anchor', function(d) {
+                        const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+                        return (midangle < Math.PI ? 'start' : 'end')
+                    })
+            }
         }
     </script>
 </body>
