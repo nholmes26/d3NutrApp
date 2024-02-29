@@ -74,14 +74,17 @@
             var nutrientColumn = nutrition_data[selected_food];
             if (nutr_totals.length === 0) {
                 nutr_totals = Object.entries(nutrientColumn);
+                for (let i = 0; i < nutr_totals.length; i++) {
+                    nutr_totals[i][1] = (nutr_totals[i][1] / 100) * $('#servings').val();
+                }
             } else {
                 var temp_nutr = Object.entries(nutrientColumn);
+                for (let i = 0; i < temp_nutr.length; i++) {
+                    temp_nutr[i][1] = (temp_nutr[i][1] / 100) * $('#servings').val();
+                }
                 for (let i = 0; i < nutr_totals.length; i++) {
                     nutr_totals[i][1] += temp_nutr[i][1];
                 }
-            }
-            for (let i = 0; i < nutr_totals.length; i++) {
-                    nutr_totals[i][1] = (nutr_totals[i][1] / 100) * $('#servings').val();
             }
             $.post('/update_food', { selected_food: selected_food }, function (data) {
                 console.log(data.status);
@@ -105,6 +108,7 @@
             var carbArr = [nutr_totals[1][1], remaining[1][1]];
             var protArr = [nutr_totals[2][1], remaining[2][1]];
             var fatArr = [nutr_totals[3][1], remaining[3][1]];
+
             createVis("#cal_vis", "Calories", calArr);
             createVis("#carb_vis", "Carbohydrates", carbArr);
             createVis("#prot_vis", "Protein", protArr);
