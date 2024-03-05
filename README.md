@@ -7,7 +7,6 @@ For our final project in COMP790 - Information Visualization, we are utlilizing 
 - Unique ability to display progress towards nutritional goals in percentages, rather than specific counts
 - This enables intake tracking WITHOUT ever displaying any calorie counts, hopefully preventing potentially triggering effects intake tracking can have on users that have struggled with eating disorders
 - For those that do wish to see counts, easy to switch with a simple dropdown in the top right corner
-<br />
 
 Data:
 - We obtained recommended intake levels for calories, carbohydrates, fats, and proteins from https://health.gov/our-work/nutrition-physical-activity/dietary-guidelines/previous-dietary-guidelines/2015/advisory-report/appendix-e-3/appendix-e-31a4 <br />
