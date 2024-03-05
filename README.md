@@ -16,4 +16,4 @@ Data:
 To run locally:
 - Clone this repo using `git clone git@github.com:nholmes26/d3NutrApp.git`
 - Navigate to the d3NutrApp directory in a terminal and run `python app.py`
-- If encountering an access error on Google Chrome despite correctly following the above steps to run locally, try navigating to chrome://net-internals/#sockets in your browser and then click 'Flush socket pools'
+- If encountering an access error on Google Chrome despite correctly following the above steps to run locally, try navigating to chrome://net-internals/#sockets in your chrome browser and then click 'Flush socket pools'
