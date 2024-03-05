@@ -1,6 +1,6 @@
 # d3NutrApp
 
-For our final project in COMP790 - Information Visualization, we are utlilizing d3 to create a Nutrition App that tracks macronutrient intake in a manner that is safe for those with eating disorders. <br />
+For our final project in COMP790 - Information Visualization, we are utlilizing d3 to create a Nutrition App that tracks macronutrient intake in a manner that is safe for those with eating disorders. 
 - Powered by Flask
 - Creates donut charts that track one's progress towards their daily caloric and macronutrient goals
 - Users simply select the gender/age option that they fall under, and then enter foods consumed (measured in grams) 
