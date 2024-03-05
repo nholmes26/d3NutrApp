@@ -8,6 +8,7 @@ For our final project in COMP790 - Information Visualization, we are utlilizing 
 - This enables intake tracking WITHOUT ever displaying any calorie counts, hopefully preventing potentially triggering effects intake tracking can have on users that have struggled with eating disorders
 - For those that do wish to see counts, easy to switch with a simple dropdown in the top right corner
 <br /> <br />
+
 Data:
 
 - We obtained recommended intake levels for calories, carbohydrates, fats, and proteins from https://health.gov/our-work/nutrition-physical-activity/dietary-guidelines/previous-dietary-guidelines/2015/advisory-report/appendix-e-3/appendix-e-31a4 <br />
@@ -19,6 +20,5 @@ To run locally:
 - Clone this repo using `git clone git@github.com:nholmes26/d3NutrApp.git`
 - Navigate to the d3NutrApp directory in a terminal and run `python app.py` 
 <br />
-Debug info:
-<br />
+Debug info: <br />
 - If encountering an access error on Google Chrome despite correctly following the above steps to run locally, try navigating to chrome://net-internals/#sockets and then select 'Flush socket pools'
