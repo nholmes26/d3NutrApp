@@ -23,4 +23,4 @@ To run locally:
 <br />
 Debug info: <br />
 
-- If encountering an access error on Google Chrome despite correctly following the above steps to run locally, try navigating to chrome://net-internals/#sockets and then select 'Flush socket pools'
+- If encountering an access error on Google Chrome despite correctly following the above steps to run locally, try navigating to chrome://net-internals/#sockets in your browser and then click 'Flush socket pools'
