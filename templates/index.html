@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://d3js.org/d3.v6.js"></script>
-    <title>Flask Nutrition App</title>
+    <title>MacroMate</title>
     <style>
         .visualization-container {
             display: flex;
@@ -15,19 +15,76 @@
         #inputDiv {
             display: flex;
             justify-content: space-between;
+            text-align: center;
+        }
+        #inputDivTwo {
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            text-align: center;
         }
         #modeDiv {
             position: fixed;
             top: 10px; /* Adjust the top position as needed */
             right: 10px; /* Adjust the right position as needed */
         }
+
+        /* Set background color for the entire page */
+        body {
+            background-color: #e7e6dd ; /* Light background color */
+            font-family: 'Comic Sans MS', cursive; /* Set the default font to Comic Sans MS */
+        }
     </style>
+    <style>
+        /* Center the header */
+        img {
+            display: block;
+            margin: 0 auto; /* Center the image */
+            padding: 10px; /* Add some padding to the image */
+            width: 150px; /* Set the width of the image */
+            height: auto; /* Maintain aspect ratio */
+            /*border: 1px solid #FFFFFF; */
+            
+        }
+
+         /* Style for the welcome text */
+        #welcomeText {
+            text-align: center;
+            font-family: 'Comic Sans MS', cursive; /* Set the font to Impact */
+            color: #000000; /* Set the color to #30974B */
+            font-size: 24px;
+            margin-bottom: 20px; /* Add space between the welcome text and input content */
+        
+        }
+
+        #logText {
+            text-align: left;
+            margin-top: 20px;
+
+
+        }
+
+        #inputAge {
+            display: flex;
+            margin: 0 auto; /* Center the input */
+
+
+        }
+        
+      </style>
 </head>
 <body>
-    <h1>Nutrition App</h1>
+    <img src="/static/macroMate.jpg" alt="Macro Mate">
 
-    <div id="inputDiv">
+    <div id="welcomeText">
+        Welcome to MacroMate, your personal Macronutrient tracker! 
+        <br>
+    </div>
 
+    <br><br>
+    
+
+    <div id="inputDivTwo">
         <div class="input">
             <label for="age_gender">Select Age/Gender:</label>
             <select id="age_gender" name="age_gender" onchange="updateRecs()">
@@ -37,6 +94,10 @@
                 {% endfor %}
             </select>
         </div>
+    </div>
+
+        <br><br>
+    <div id="inputDiv"> 
 
         <div class="input">
             <label for="food">Select Food:</label>
@@ -79,6 +140,14 @@
         <div id="fat_vis">Total Fat:</div>
     </div>
 
+    <br><br>
+
+    <div id="logText">
+        Logged Foods:
+        <ul id="selectedFoods"></ul>
+    </div>
+</div>
+
     <script>
         // Set up global variables
         var intakes_data = {{ intakes_data|safe }};
@@ -86,11 +155,14 @@
         var intake_recs = []
         var nutr_totals = []
         var remaining = []
+        var selectedFoods = []
 
         function clearPage() {
             intake_recs = []
             nutr_totals = []
             remaining = []
+            selectedFoods = []
+            displaySelectedFoods()
             d3.selectAll('svg').remove();
             $('#age_gender').val('Select Demographic');
             $('#food').val('');
@@ -113,6 +185,8 @@
         function updateFood() {
             d3.selectAll('svg').remove();
             var selected_food = $('#food').val();
+            var selected_amount = $('#servings').val();
+            selectedFoods.push({ food: selected_food, amount: selected_amount });            
             var nutrientColumn = nutrition_data[selected_food];
             if (nutr_totals.length === 0) {
                 nutr_totals = Object.entries(nutrientColumn);
@@ -132,6 +206,20 @@
                 console.log(data.status);
             });
             updateRemaining();
+            // Display selected foods
+            displaySelectedFoods();
+        }
+
+
+
+        function displaySelectedFoods() {
+            // Clear the previous list
+            $('#selectedFoods').empty();
+
+            // Iterate through the selected foods array and add them to the list
+            selectedFoods.forEach(function(item) {
+                $('#selectedFoods').append('<li>' + item.food + ' - Amount: ' + item.amount + 'g</li>');
+            });
         }
 
         function updateServings() {
