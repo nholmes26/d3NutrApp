@@ -34,19 +34,19 @@ def index():
 @app.route('/update_selection', methods=['POST'])
 def update_selection():
     global selected_age_gender
-    selected_age_gender = request.form['selected_age_gender']
+    selected_age_gender = request.form['selected_age_gender'] # type: ignore
     return jsonify({'status': 'success'})
 
 @app.route('/update_food', methods=['POST'])
 def update_food():
     global selected_food
-    selected_food = request.form['selected_food']
+    selected_food = request.form['selected_food'] # type: ignore
     return jsonify({'status': 'success'})
 
 @app.route('/update_servings', methods=['POST'])
 def update_servings():
     global selected_servings
-    selected_servings = int(request.form['servings'])
+    selected_servings = int(request.form['servings']) # type: ignore
     return jsonify({'status': 'success'})
 
 if __name__ == '__main__':
