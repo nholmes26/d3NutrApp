@@ -87,7 +87,7 @@
     <div id="inputDivTwo">
         <div class="input">
             <label for="age_gender">Select Age/Gender:</label>
-            <select id="age_gender" name="age_gender" onchange="updateRecs()">
+            <select id="age_gender" name="age_gender" onchange="clearCurr(), updateRecs()">
                 <option value="Select Demographic" selected>Select Demographic</option>
                 {% for age_gender in age_genders %}
                     <option value="{{ age_gender }}" {% if age_gender == selected_age_gender %}selected{% endif %}>{{ age_gender }}</option>
@@ -169,8 +169,19 @@
             $('#servings').val('1');
         }
 
-        function updateRecs() {
+        function clearCurr() {
+            intake_recs = []
             nutr_totals = []
+            remaining = []
+            selectedFoods = []
+            displaySelectedFoods()
+            d3.selectAll('svg').remove();
+            $('#food').val('');
+            $('#servings').val('1');
+        }
+
+        function updateRecs() {
+            nutr_totals = [];
             var selectedGender = $('#age_gender').val();
             var intakeColumn = intakes_data[selectedGender];
             intake_recs = Object.entries(intakeColumn);
