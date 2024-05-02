@@ -338,6 +338,10 @@
                 }
                 // Display recommendations
                 displayNextRecommendation();
+            } else {
+                // Hide recommendationDiv if no recommendations
+                var recommendationDiv = document.getElementById("recommendation");
+                recommendationDiv.style.display = "none";
             }
 
             createVis("#cal_vis", "Calories", calArr);
