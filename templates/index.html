@@ -72,6 +72,22 @@
         }
         
       </style>
+      <style>
+        /* Your existing CSS styles */
+    
+        #recommendation {
+            text-align: center; /* Center align the text */
+            background-color: #f0f0f0; /* Light gray background */
+            border: 1px solid #ccc; /* Gray border */
+            padding: 10px; /* Add some padding */
+            margin: 20px auto; /* Center the recommendation horizontally */
+            width: 80%; /* Set width */
+            max-width: 400px; /* Maximum width */
+            border-radius: 10px; /* Rounded corners */
+            display: none; /* Initially hide the recommendation */
+        }
+    </style>
+    
 </head>
 <body>
     <img src="/static/macroMate.jpg" alt="Macro Mate">
@@ -138,6 +154,14 @@
         <div id="carb_vis">Carbohydrates:</div>
         <div id="prot_vis">Protein:</div>
         <div id="fat_vis">Total Fat:</div>
+    </div>
+
+    <br><br>
+
+    <!-- Recommendation section -->
+    <div id="recommendation">
+        <p>Recommendation</p>
+        <p id="recommendationText"></p>
     </div>
 
     <br><br>
@@ -265,27 +289,36 @@
             
             // recommendation feature
             // alerts user if they are low on a nutrient
-            if (selectedFoods.length > 1){
+            if (selectedFoods.length > 1) {
                 for (let i = 1; i < nutr_totals.length; i++) {
                     var totalNutrient = nutr_totals[i][1];
                     var remainingNutrient = remaining[i][1];
                     var intakeRec = intake_recs[i][1];
-                    if (remaining[0][1] < intake_recs[0][1]*0.5 && remainingNutrient > intakeRec*0.5) {
+                    if (remaining[0][1] < intake_recs[0][1] * 0.5 && remainingNutrient > intakeRec * 0.5) {
                         nutrient_name = intake_recs[i][0].split(",")[0];
+                        var recommendation = "";
                         if (nutrient_name === "Total Fat") {
                             nutrient_name = "Fat";
-                            alert("You are low on " + nutrient_name + " today, consider adding more fatty meats");
+                            recommendation = "consider adding more fatty meats.";
                         } else if (intake_recs[i][0] === "Carbohydrate, g") {
-                            alert("You are low on " + nutrient_name + " today, consider adding more breads and pastas");
+                            recommendation = "consider adding more breads and pastas.";
                         } else if (intake_recs[i][0] === "Protein, g") {
-                            alert("You are low on " + nutrient_name + " today, consider adding more chicken and fish");
+                            recommendation = "consider adding more chicken and fish.";
                         } else {
-                            alert("You are low on " + nutrient_name + " today, consider adding more " + nutrient_name);
+                            recommendation = "consider adding more " + nutrient_name + ".";
                         }
-                        
+                        // Show recommendation in UI
+                        var recommendationDiv = document.getElementById("recommendation");
+                        recommendationDiv.innerText = "You are low on " + nutrient_name + " today, " + recommendation;
+                        recommendationDiv.style.display = "block";
+                        // Hide recommendation after 5 seconds
+                        setTimeout(function() {
+                            recommendationDiv.style.display = "none";
+                        }, 5000); // 5 seconds
                     }
                 }
-            }
+            }            
+
             createVis("#cal_vis", "Calories", calArr);
             createVis("#carb_vis", "Carbohydrates", carbArr);
             createVis("#prot_vis", "Protein", protArr);
