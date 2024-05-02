@@ -262,7 +262,30 @@
             var carbArr = [nutr_totals[1][1], remaining[1][1]];
             var protArr = [nutr_totals[2][1], remaining[2][1]];
             var fatArr = [nutr_totals[3][1], remaining[3][1]];
-
+            
+            // recommendation feature
+            // alerts user if they are low on a nutrient
+            if (selectedFoods.length > 1){
+                for (let i = 1; i < nutr_totals.length; i++) {
+                    var totalNutrient = nutr_totals[i][1];
+                    var remainingNutrient = remaining[i][1];
+                    var intakeRec = intake_recs[i][1];
+                    if (remaining[0][1] < intake_recs[0][1]*0.5 && remainingNutrient > intakeRec*0.5) {
+                        nutrient_name = intake_recs[i][0].split(",")[0];
+                        if (nutrient_name === "Total Fat") {
+                            nutrient_name = "Fat";
+                            alert("You are low on " + nutrient_name + " today, consider adding more fatty meats");
+                        } else if (intake_recs[i][0] === "Carbohydrate, g") {
+                            alert("You are low on " + nutrient_name + " today, consider adding more breads and pastas");
+                        } else if (intake_recs[i][0] === "Protein, g") {
+                            alert("You are low on " + nutrient_name + " today, consider adding more chicken and fish");
+                        } else {
+                            alert("You are low on " + nutrient_name + " today, consider adding more " + nutrient_name);
+                        }
+                        
+                    }
+                }
+            }
             createVis("#cal_vis", "Calories", calArr);
             createVis("#carb_vis", "Carbohydrates", carbArr);
             createVis("#prot_vis", "Protein", protArr);
