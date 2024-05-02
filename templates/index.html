@@ -180,6 +180,7 @@
         var nutr_totals = []
         var remaining = []
         var selectedFoods = []
+        var recommendationQueue = [];
 
         function clearPage() {
             intake_recs = []
@@ -210,6 +211,27 @@
             var intakeColumn = intakes_data[selectedGender];
             intake_recs = Object.entries(intakeColumn);
             remaining = Object.entries(intakeColumn);
+        }
+
+        function displayNextRecommendation() {
+            // Check if there are recommendations in the queue
+            if (recommendationQueue.length > 0) {
+                // Show the first recommendation in the queue
+                var nextRecommendation = recommendationQueue.shift();
+                var recommendationDiv = document.getElementById("recommendation");
+                recommendationDiv.innerHTML += "<br>" + nextRecommendation;
+                recommendationDiv.style.display = "block";
+
+                // Hide recommendation after 5 seconds
+                setTimeout(function() {
+                    recommendationDiv.innerHTML = recommendationDiv.innerHTML.replace("<br>" + nextRecommendation, "");
+                    if (recommendationDiv.innerHTML.trim() === "") {
+                        recommendationDiv.style.display = "none";
+                    }
+                    // Display the next recommendation in the queue
+                    displayNextRecommendation();
+                }, 5000); // 5 seconds
+            }
         }
 
         function clearFood() {
@@ -288,12 +310,16 @@
             var fatArr = [nutr_totals[3][1], remaining[3][1]];
             
             // recommendation feature
-            // alerts user if they are low on a nutrient
+            // alerts user if they are low on a nutrient    
             if (selectedFoods.length > 1) {
                 for (let i = 1; i < nutr_totals.length; i++) {
                     var totalNutrient = nutr_totals[i][1];
                     var remainingNutrient = remaining[i][1];
                     var intakeRec = intake_recs[i][1];
+                    if ($('#mode').val() === "percent") {
+                        totalNutrient = (totalNutrient / 100) * intakeRec;
+                        remainingNutrient = (remainingNutrient / 100) * intakeRec;
+                    }
                     if (remaining[0][1] < intake_recs[0][1] * 0.5 && remainingNutrient > intakeRec * 0.5) {
                         nutrient_name = intake_recs[i][0].split(",")[0];
                         var recommendation = "";
@@ -307,17 +333,12 @@
                         } else {
                             recommendation = "consider adding more " + nutrient_name + ".";
                         }
-                        // Show recommendation in UI
-                        var recommendationDiv = document.getElementById("recommendation");
-                        recommendationDiv.innerText = "You are low on " + nutrient_name + " today, " + recommendation;
-                        recommendationDiv.style.display = "block";
-                        // Hide recommendation after 5 seconds
-                        setTimeout(function() {
-                            recommendationDiv.style.display = "none";
-                        }, 5000); // 5 seconds
+                        recommendationQueue.push("You are low on " + nutrient_name + " today, " + recommendation);
                     }
                 }
-            }            
+                // Display recommendations
+                displayNextRecommendation();
+            }
 
             createVis("#cal_vis", "Calories", calArr);
             createVis("#carb_vis", "Carbohydrates", carbArr);
